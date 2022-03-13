@@ -1,11 +1,29 @@
 const jwt = require('jsonwebtoken');
 const db = require('../data/db');
+require('dotenv').config();
 
 
-function register(body){
+async function register(body){
     const username = body.username;
     const password = body.password;
-    db.test();
+    let free = await db.isUsernameFree(username);
+    if(free){
+        const token = jwt.sign({username: username,password: password},process.env.SECRET);
+        let success = await db.registerUser(username,password,token);
+        if(success){
+            return {success: true, token: token};
+        }else{
+            return {success:false}
+        }
+    }else{
+        return {success:false}
+    }
 }
 
-module.exports = {register}
+async function login(body){
+    const username = body.username;
+    const password = body.password;
+    
+}
+
+module.exports = {register,login}

@@ -1,8 +1,19 @@
 let mysql = require('mysql');
-require('dotenv').config()
+require('dotenv').config();
+let crypto = require("crypto");
 
-async function getUser(username){
-    let user = executeQuery("select * from user where username ")
+async function isUsernameFree(username){
+    let user = await executeQuery("select * from user where username = ?",[username]);
+    return user.length == 0;
+}
+
+async function registerUser(username, password,token){
+    const protectedpassword = crypto.createHash('md5').update(password).digest("hex");
+    let res = await executeQuery("insert into user(username, password, token) values(?,?,?)",[username,protectedpassword,token]);
+    if(res.affectedRows != 1){
+        return false;
+    }
+    return true;
 }
 
 async function executeQuery(statement,parameters=undefined){
@@ -39,4 +50,4 @@ async function executeQuery(statement,parameters=undefined){
     })
 }
 
-module.exports = { test}
+module.exports = { isUsernameFree, registerUser }

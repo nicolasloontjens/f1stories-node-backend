@@ -4,6 +4,7 @@ db-migrate up --config .\config\database.json
 create table user(
   id int primary key auto_increment,
   username nvarchar(200),
+  password nvarchar(1000),
   token nvarchar(1000)
 );
 
