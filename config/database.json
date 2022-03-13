@@ -1,0 +1,12 @@
+{
+    "dev": {
+      "host": "localhost",
+      "port":"3307",
+      "user": { "ENV" : "DB_USERNAME" },
+      "password" : { "ENV" : "DB_PASSWORD" },
+      "database": "f1storiesnode",
+      "driver": "mysql",
+      "multipleStatements": true
+    },
+    "sql-file":true
+}
