@@ -16,6 +16,19 @@ async function registerUser(username, password,token){
     return true;
 }
 
+async function loginUser(username, password){
+    const protectedpassword = crypto.createHash('md5').update(password).digest("hex");
+    let user = await executeQuery("select * from user where username = ? and password = ?",[username,protectedpassword]);
+    if(user.length == 1){
+        return {success:true, id:user[0].id};
+    }
+    return {success:false};
+}
+
+async function updateToken(id, token){
+    await executeQuery("update user set token = ? where id = ?",[token,id]);
+}
+
 async function executeQuery(statement,parameters=undefined){
     let connection = mysql.createConnection({
         host: process.env.DB_HOST,
@@ -50,4 +63,4 @@ async function executeQuery(statement,parameters=undefined){
     })
 }
 
-module.exports = { isUsernameFree, registerUser }
+module.exports = { isUsernameFree, registerUser, loginUser, updateToken }

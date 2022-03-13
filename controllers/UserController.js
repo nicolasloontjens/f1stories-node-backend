@@ -23,7 +23,14 @@ async function register(body){
 async function login(body){
     const username = body.username;
     const password = body.password;
-    
+    let res = await db.loginUser(username, password);
+    if(res.success){
+        const token = jwt.sign({username: username,password: password},process.env.SECRET);
+        await db.updateToken(res.id, token);
+        return {success:true,token:token};
+    }else{
+        return {success:false};
+    }
 }
 
 module.exports = {register,login}
