@@ -2,11 +2,13 @@ let mysql = require('mysql');
 require('dotenv').config();
 let crypto = require("crypto");
 
+//check if username is available for registration
 async function isUsernameFree(username){
     let user = await executeQuery("select * from user where username = ?",[username]);
     return user.length == 0;
 }
 
+//register the user and return their token
 async function registerUser(username, password,token){
     const protectedpassword = crypto.createHash('md5').update(password).digest("hex");
     let res = await executeQuery("insert into user(username, password, token) values(?,?,?)",[username,protectedpassword,token]);
@@ -16,6 +18,7 @@ async function registerUser(username, password,token){
     return true;
 }
 
+//login user, create new token and give them token
 async function loginUser(username, password){
     const protectedpassword = crypto.createHash('md5').update(password).digest("hex");
     let user = await executeQuery("select * from user where username = ? and password = ?",[username,protectedpassword]);
@@ -25,10 +28,12 @@ async function loginUser(username, password){
     return {success:false};
 }
 
+//function to update user token
 async function updateToken(id, token){
     await executeQuery("update user set token = ? where id = ?",[token,id]);
 }
 
+//promise version to execute query's
 async function executeQuery(statement,parameters=undefined){
     let connection = mysql.createConnection({
         host: process.env.DB_HOST,
@@ -63,4 +68,8 @@ async function executeQuery(statement,parameters=undefined){
     })
 }
 
-module.exports = { isUsernameFree, registerUser, loginUser, updateToken }
+async function getStories(){
+    return await executeQuery("select * from stories");
+}
+
+module.exports = { isUsernameFree, registerUser, loginUser, updateToken, getStories }
