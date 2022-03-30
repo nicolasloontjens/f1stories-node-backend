@@ -12,7 +12,7 @@ async function isUsernameFree(username){
 //register the user and return their token
 async function registerUser(username, password,token){
     const protectedpassword = crypto.createHash('md5').update(password).digest("hex");
-    let res = await executeQuery("insert into user(username, password, token) values(?,?,?)",[username,protectedpassword,token]);
+    let res = await executeQuery("insert into user(username, password, token, userscore) values(?,?,?,?)",[username,protectedpassword,token, 0]);
     console.log(res.insertId);
     if(res.affectedRows != 1){
         return {success:false};

@@ -5,7 +5,8 @@ create table user(
   id int primary key auto_increment,
   username nvarchar(200),
   password nvarchar(1000),
-  token nvarchar(1000)
+  token nvarchar(1000),
+  userscore int not null
 );
 
 create table stories(
@@ -14,36 +15,19 @@ create table stories(
     content nvarchar(5000),
     score int,
     country nvarchar(300),
-    date date default (current_date),
-    raceid int
-);
-
-create table userpoints
-(
-    userid    int not null,
-    userscore int not null,
-    foreign key (userid) references user (id)
-);
-
-create table userstories(
     userid int,
-    storyid int,
-    foreign key(userid) references user(id),
-    foreign key(storyid) references stories(storyid)
+    date date default (current_date),
+    raceid int,
+    foreign key (userid) references user(id)
 );
 
 create table comments(
     commentid int primary key auto_increment,
     userid int,
-    content nvarchar(300),
-    foreign key (userid) references user(id)
-);
-
-create table storycomments(
     storyid int,
-    commentid int,
-    foreign key (storyid) references stories(storyid),
-    foreign key (commentid) references comments(commentid)
+    content nvarchar(300),
+    foreign key (userid) references user(id),
+    foreign key (storyid) references stories(storyid)
 );
 
 create table storyimages(
