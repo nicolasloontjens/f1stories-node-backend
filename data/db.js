@@ -1,4 +1,5 @@
 let mysql = require('mysql');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 let crypto = require("crypto");
 
@@ -12,10 +13,13 @@ async function isUsernameFree(username){
 async function registerUser(username, password,token){
     const protectedpassword = crypto.createHash('md5').update(password).digest("hex");
     let res = await executeQuery("insert into user(username, password, token) values(?,?,?)",[username,protectedpassword,token]);
+    console.log(res.insertId);
     if(res.affectedRows != 1){
-        return false;
+        return {success:false};
     }
-    return true;
+    const tokenwithid = jwt.sign({uid:res.insertId,username:username,password:password},process.env.SECRET);
+    await updateToken(res.insertId,tokenwithid);
+    return {success:true,token:tokenwithid};
 }
 
 //login user, create new token and give them token

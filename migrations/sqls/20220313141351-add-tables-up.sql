@@ -88,4 +88,12 @@ create table userraces(
     raceid int,
     foreign key (userid) references user(id),
     foreign key (raceid) references races(raceid)
+);
+
+create table userinteracts(
+    userid int,
+    storyid int,
+    interaction int,
+    foreign key (userid) references user(id),
+    foreign key (storyid) references stories(storyid)
 )
