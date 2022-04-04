@@ -1,4 +1,5 @@
 const db = require('../data/db');
+const jwt = require('jsonwebtoken');
 
 async function getStories(req){
     let data =  await db.getStories();
@@ -15,4 +16,35 @@ async function getStories(req){
     return data.slice(startIndex,endIndex);
 }
 
-module.exports = { getStories };
+async function addStory(req){
+    let uid = jwt.decode(req.get('Authorization')).uid;
+    let post = req.body;
+    post.userid = uid;
+    return await db.addStory(post)
+}
+
+async function updateStory(req){
+    let data = req.body;
+    if(await db.checkIfPostBelongsToUser(req.params.id, jwt.decode(req.get('Authorization')).uid)){
+        let result = await db.updateStory(req.params.id, data.title, data.content);
+        if(result){
+            return true;
+        }
+    }
+    return false;
+}
+
+async function deleteStory(req){
+    if(await db.checkIfPostBelongsToUser(req.params.id, jwt.decode(req.get('Authorization')).uid)){
+        let result = await db.deleteStory()
+    }
+}
+
+function noToken(req){
+    if(req.get('authorization')===undefined){
+        return true;
+    }
+    return false;
+}
+
+module.exports = { getStories, addStory, updateStory, deleteStory, noToken};

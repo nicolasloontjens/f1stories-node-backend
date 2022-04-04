@@ -13,7 +13,6 @@ async function isUsernameFree(username){
 async function registerUser(username, password,token){
     const protectedpassword = crypto.createHash('md5').update(password).digest("hex");
     let res = await executeQuery("insert into user(username, password, token, userscore) values(?,?,?,?)",[username,protectedpassword,token, 0]);
-    console.log(res.insertId);
     if(res.affectedRows != 1){
         return {success:false};
     }
@@ -76,4 +75,37 @@ async function getStories(){
     return await executeQuery("select * from stories");
 }
 
-module.exports = { isUsernameFree, registerUser, loginUser, updateToken, getStories }
+async function addStory(story){
+    //filter out emoji' people might put in their post
+    let title = story.title.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
+    let content = story.content.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
+    let result = await executeQuery("insert into stories(title, content, score, country, userid, raceid) values(?,?,0,?,?,?)",[title, content, story.country, story.userid, story.raceid]);
+    if(result.affectedRows != 1){
+        return {success:false};
+    }
+    let createdStory = await executeQuery("select * from stories where storyid = ?",result.insertId);
+    return {success:true,story:createdStory[0]};
+}
+
+async function updateStory(postid, title, content){
+    let newtitle = title.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
+    let newcontent = content.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
+    let result = await executeQuery("update stories set title = ?, content = ? where storyid = ?",[newtitle, newcontent, postid]);
+    if(result.changedRows == 1){
+        return true;
+    }
+}
+
+async function deleteStory(storyid){
+    let result = await executeQuery("delete from stories where storyid = ?",storyid);
+    console.log(result);
+}
+
+async function checkIfPostBelongsToUser(postid, uid){
+    let result = await executeQuery("select * from stories where storyid = ? and userid = ?",[postid, uid]);
+    if(result.length == 1){
+        return true;
+    }
+}
+
+module.exports = { isUsernameFree, registerUser, loginUser, updateToken, getStories, addStory, updateStory, deleteStory, checkIfPostBelongsToUser }

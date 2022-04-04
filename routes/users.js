@@ -9,7 +9,7 @@ router.post('/register', async function(req, res) {
     res.send({token: data.token});
   }else{
     res.status(400).send({
-      message:'Could not register'
+      message:'Username taken'
     })
   }
 });
