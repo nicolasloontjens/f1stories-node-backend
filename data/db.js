@@ -112,4 +112,12 @@ async function checkIfPostBelongsToUser(postid, uid){
     }
 }
 
-module.exports = { isUsernameFree, registerUser, loginUser, updateToken, getStories, addStory, updateStory, deleteStory, checkIfPostBelongsToUser }
+async function getComments(storyid){
+    return await executeQuery("select c.*, u.username from comments c join user u on c.userid = u.id where storyid = ?", storyid);
+}
+
+module.exports = { isUsernameFree, 
+    registerUser, loginUser, updateToken, getStories, 
+    addStory, updateStory, deleteStory, checkIfPostBelongsToUser,
+    getComments 
+}

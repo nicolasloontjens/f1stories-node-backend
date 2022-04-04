@@ -1,6 +1,8 @@
 let express = require('express');
 let router = express.Router();
 let userController = require('../controllers/UserController')
+let storyController = require('../controllers/StoryController')
+
 
 
 router.post('/register', async function(req, res) {
@@ -23,6 +25,10 @@ router.post('/login',async function(req, res){
       message:'Could not log in'
     })
   }
+})
+
+router.get("/:id",async function(req, res){
+
 })
 
 module.exports = router;

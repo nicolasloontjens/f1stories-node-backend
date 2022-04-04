@@ -49,4 +49,8 @@ router.delete("/:id",async function (req, res){
     }
 })
 
+router.get("/:id/comments",async function(req, res){
+    res.send(await storyController.getComments(req));
+})
+
 module.exports = router;
