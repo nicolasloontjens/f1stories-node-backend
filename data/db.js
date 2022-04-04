@@ -94,11 +94,15 @@ async function updateStory(postid, title, content){
     if(result.changedRows == 1){
         return true;
     }
+    return false;
 }
 
 async function deleteStory(storyid){
     let result = await executeQuery("delete from stories where storyid = ?",storyid);
-    console.log(result);
+    if(result.affectedRows == 1){
+        return true;
+    }
+    return false;
 }
 
 async function checkIfPostBelongsToUser(postid, uid){

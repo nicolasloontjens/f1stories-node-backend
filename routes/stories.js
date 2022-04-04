@@ -35,4 +35,18 @@ router.put('/:id',async function (req, res){
     }
 })
 
+router.delete("/:id",async function (req, res){
+    if(storyController.noToken(req)){
+        res.status(401).send({"error":"no token found"});
+        return;
+    }
+    let data = await storyController.deleteStory(req);
+    if(data){
+        res.status(202).send({message:"Deleted story"});
+    }
+    else{
+        res.status(400).send({message:"Something went wrong"});
+    }
+})
+
 module.exports = router;
