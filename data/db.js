@@ -128,8 +128,23 @@ async function addComment(storyid, uid, content){
     }
 }
 
+async function checkIfCommentBelongsToUser(commentid, uid){
+    let result = await executeQuery("select * from comments where commentid = ? and userid = ?",[commentid, uid]);
+    if(result.length == 1){
+        return true;
+    }
+}
+
+async function updateComment(commentid, content){
+    let result = await executeQuery("update comments set content = ? where commentid = ?",[content, commentid]);
+    if(result.affectedRows == 1){
+        return {success:true,comment: await executeQuery("select c.*, u.username from comments c join user u on c.userid = u.id where commentid = ?", commentid)};
+    }
+    return {success:false};
+}
+
 module.exports = { isUsernameFree, 
     registerUser, loginUser, updateToken, getStories, 
     addStory, updateStory, deleteStory, checkIfPostBelongsToUser,
-    getComments, addComment 
+    getComments, addComment, checkIfCommentBelongsToUser, updateComment
 }

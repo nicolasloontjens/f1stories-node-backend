@@ -12,5 +12,14 @@ async function addComment(req){
     return await db.addComment(storyid, uid, content);
 }
 
+async function updateComment(req){
+    let commentid = parseInt(req.params.id);
+    let uid = jwt.decode(req.get('Authorization')).uid;
+    let content = req.body.content;
+    if(db.checkIfCommentBelongsToUser(commentid,uid)){
+        return db.updateComment(commentid, content);
+    }
+    return {success:false};
+}
 
-module.exports = { getComments, addComment };
+module.exports = { getComments, addComment, updateComment };
