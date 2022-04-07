@@ -39,6 +39,13 @@ async function deleteStory(req){
     return false;
 }
 
+async function interactWithPost(req){
+    let uid = jwt.decode(req.get('Authorization')).uid;
+    let value = req.body.interact;
+    let storyid = req.params.id;
+    return await db.interactWithPost(storyid, uid, value);
+}
+
 function noToken(req){
     if(req.get('authorization')===undefined){
         return true;
@@ -46,4 +53,4 @@ function noToken(req){
     return false;
 }
 
-module.exports = { getStories, addStory, updateStory, deleteStory, noToken};
+module.exports = { getStories, addStory, updateStory, deleteStory, interactWithPost, noToken};

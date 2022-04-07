@@ -145,9 +145,47 @@ async function deleteComment(commentid){
     return result.affectedRows == 1;
 }
 
+async function interactWithPost(storyid, uid, value){
+    let getinteract = await executeQuery("select * from userinteracts where userid = ? and storyid = ?",[uid, storyid])
+    if(getinteract.length == 1){
+        let previousinteract = await executeQuery("select interaction from userinteracts where userid = ? and storyid = ?",[uid, storyid]);
+        console.log(previousinteract[0].interaction);
+        if(previousinteract[0].interaction == value){
+            return {success:false,message:"Can't like / dislike, you already liked / disliked."};
+        }
+        let query1 =  await executeQuery("update userinteracts set interaction = ? where userid = ? and storyid = ?",[value, uid, storyid]);
+        if(value == 1){
+            return setStoryScore(storyid, "update stories set score = score + 1 where storyid = ?", query1);
+        }
+        if(value == 0){
+            return setStoryScore(storyid, "update stories set score = score - 1 where storyid = ?", query1);
+        }
+    }else{
+        if(value == 0){
+            return {success:false,message:"Can't dislike a post you haven't liked"};
+        }
+        await executeQuery("insert into userinteracts(userid, storyid, interaction) values(?,?,?)",[uid, storyid, value])
+        let res = await executeQuery("update stories set score = score + 1 where storyid = ?",storyid);
+        if(res.affectedRows == 1){
+            return {success:true,message:"interacted with story!"};
+        }else{
+            return {success:false,message:"something went wrong"};
+        }
+    }
+}
+
+async function setStoryScore(storyid, query, query1){
+    let res = await executeQuery(query,storyid);
+    if(query1.affectedRows == 1 && res.affectedRows == 1){
+        return {success:true,message:"interacted with story!"};
+    }else{
+        return {success:false,message:"something went wrong"};
+    }
+}
+
 module.exports = { isUsernameFree, 
     registerUser, loginUser, updateToken, getStories, 
     addStory, updateStory, deleteStory, checkIfPostBelongsToUser,
     getComments, addComment, checkIfCommentBelongsToUser, updateComment,
-    deleteComment
+    deleteComment, interactWithPost
 }
