@@ -116,8 +116,20 @@ async function getComments(storyid){
     return await executeQuery("select c.*, u.username from comments c join user u on c.userid = u.id where storyid = ?", storyid);
 }
 
+async function addComment(storyid, uid, content){
+    try{
+        let result = await executeQuery("insert into comments(userid, storyid, content)values(?,?,?)",[uid,parseInt(storyid),content]);
+        if(result.affectedRows > 0){
+            return {success:true,comment: await executeQuery("select c.*, u.username from comments c join user u on c.userid = u.id where commentid = ?", result.insertId)};
+        }
+        return {success:false};
+    }catch(err){
+        return {success:false};
+    }
+}
+
 module.exports = { isUsernameFree, 
     registerUser, loginUser, updateToken, getStories, 
     addStory, updateStory, deleteStory, checkIfPostBelongsToUser,
-    getComments 
+    getComments, addComment 
 }

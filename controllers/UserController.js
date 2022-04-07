@@ -34,6 +34,8 @@ async function login(body){
     }
 }
 
-async function getUserPosts()
+async function getUserPosts(){
+    
+}
 
 module.exports = {register,login}

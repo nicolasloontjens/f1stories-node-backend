@@ -1,6 +1,9 @@
 let express = require('express');
+const res = require('express/lib/response');
 let router = express.Router();
-let storyController = require("../controllers/StoryController")
+let storyController = require("../controllers/StoryController");
+let commentController = require("../controllers/CommentController");
+
 
 router.get("/",async function (req,res){
     res.send(await storyController.getStories(req));
@@ -50,7 +53,21 @@ router.delete("/:id",async function (req, res){
 })
 
 router.get("/:id/comments",async function(req, res){
-    res.send(await storyController.getComments(req));
+    res.send(await commentController.getComments(req));
+})
+
+router.post("/:id/comments", async function(req, res){
+    if(storyController.noToken(req)){
+        res.status(401).send({"error":"no token found"});
+        return;
+    }
+    let data = await commentController.addComment(req);
+    if(data.success){
+        res.status(201).send(data.comment);
+    }
+    else{
+        res.status(400).send({message:"Something went wrong"});
+    }
 })
 
 module.exports = router;

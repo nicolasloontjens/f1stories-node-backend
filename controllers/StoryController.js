@@ -39,10 +39,6 @@ async function deleteStory(req){
     return false;
 }
 
-async function getComments(req){
-    return await db.getComments(req.params.id);
-}
-
 function noToken(req){
     if(req.get('authorization')===undefined){
         return true;
@@ -50,4 +46,4 @@ function noToken(req){
     return false;
 }
 
-module.exports = { getStories, addStory, updateStory, deleteStory, noToken, getComments};
+module.exports = { getStories, addStory, updateStory, deleteStory, noToken};
