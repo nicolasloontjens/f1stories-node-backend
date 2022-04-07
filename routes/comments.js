@@ -22,6 +22,11 @@ router.delete("/:id",async function(req, res){
         return;
     }
     let data = await commentController.deleteComment(req);
+    if(data){
+        res.status(200).send({"message":"comment deleted"});
+    }else{
+        res.status(400).send({"error":"something went wrong"});
+    }
 })
 
 module.exports = router;

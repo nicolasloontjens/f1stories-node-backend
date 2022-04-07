@@ -22,4 +22,13 @@ async function updateComment(req){
     return {success:false};
 }
 
-module.exports = { getComments, addComment, updateComment };
+async function deleteComment(req){
+    let uid = jwt.decode(req.get('Authorization')).uid;
+    let commentid = parseInt(req.params.id);
+    if(db.checkIfCommentBelongsToUser(commentid,uid)){
+        return db.deleteComment(commentid);
+    }
+    return false;
+}
+
+module.exports = { getComments, addComment, updateComment, deleteComment };

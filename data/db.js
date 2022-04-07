@@ -91,10 +91,7 @@ async function updateStory(postid, title, content){
     let newtitle = title.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
     let newcontent = content.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
     let result = await executeQuery("update stories set title = ?, content = ? where storyid = ?",[newtitle, newcontent, postid]);
-    if(result.changedRows == 1){
-        return true;
-    }
-    return false;
+    return result.affectedRows == 1;
 }
 
 async function deleteStory(storyid){
@@ -143,8 +140,14 @@ async function updateComment(commentid, content){
     return {success:false};
 }
 
+async function deleteComment(commentid){
+    let result = await executeQuery("delete from comments where commentid = ?", commentid);
+    return result.affectedRows == 1;
+}
+
 module.exports = { isUsernameFree, 
     registerUser, loginUser, updateToken, getStories, 
     addStory, updateStory, deleteStory, checkIfPostBelongsToUser,
-    getComments, addComment, checkIfCommentBelongsToUser, updateComment
+    getComments, addComment, checkIfCommentBelongsToUser, updateComment,
+    deleteComment
 }
