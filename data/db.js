@@ -183,9 +183,36 @@ async function setStoryScore(storyid, query, query1){
     }
 }
 
+async function getUser(uid){
+    let user = await executeQuery("select id, username, userscore from user where id = ?", uid);
+    let score = await executeQuery("select sum(score) as score from stories where userid = ?", uid);
+    let racesvisited = await executeQuery("select count(*) as count from userraces where userid = ?",uid);
+    let stories = await executeQuery("select * from stories where userid = ?", uid);
+    let res = user[0];
+    res.userscore = score[0].score;
+    res.stories = stories;
+    res.racesvisited = racesvisited[0].count;
+    return res;
+}
+
+async function addUserRace(uid, race){
+    let data = await executeQuery("select raceid from races where title = ?", race);
+    if(data.length > 0){
+        let result = await executeQuery("insert into userraces(userid, raceid)values(?,?)",[uid, data[0].raceid]);
+        if(result.affectedRows > 0){
+            return true;
+        }
+    }
+    return false;
+}
+
+async function getRaces(){
+    return await executeQuery("select * from races");
+}
+
 module.exports = { isUsernameFree, 
     registerUser, loginUser, updateToken, getStories, 
     addStory, updateStory, deleteStory, checkIfPostBelongsToUser,
     getComments, addComment, checkIfCommentBelongsToUser, updateComment,
-    deleteComment, interactWithPost
+    deleteComment, interactWithPost, getUser, addUserRace, getRaces
 }

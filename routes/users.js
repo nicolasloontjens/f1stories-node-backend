@@ -28,7 +28,28 @@ router.post('/login',async function(req, res){
 })
 
 router.get("/:id",async function(req, res){
+  try{
+    let data = await userController.get(req.params.id);
+    res.send(data);
+  }catch(err){
+    res.status(400).send({"error":"something went wrong"});
+  }
+})
 
+router.post("/:id/race",async function(req,res){
+  if(storyController.noToken(req)){
+    res.status(401).send({"error":"no token found"});
+    return;
+  }
+  try{
+    if(await userController.addRace(req)){
+      res.status(202).send({"message":"Added race!"});
+    }else{
+      res.status(400).send({"error":"something went wrong"});
+    }
+  }catch{
+    res.status(400).send({"error":"something went wrong"});
+  }
 })
 
 module.exports = router;

@@ -34,8 +34,20 @@ async function login(body){
     }
 }
 
-async function getUserPosts(){
-    
+async function get(uid){
+    return db.getUser(uid)
 }
 
-module.exports = {register,login}
+async function addRace(req){
+    let uid = jwt.decode(req.get('Authorization')).uid;
+    if(uid == parseInt(req.params.id)){
+        let uid = jwt.decode(req.get('Authorization')).uid;
+        let race = req.body.race;
+        if(await db.addUserRace(uid, race)){
+            return true;
+        }
+    }
+    return false;
+}
+
+module.exports = {register, login, get, addRace}
