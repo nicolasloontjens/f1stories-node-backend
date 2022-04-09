@@ -20,7 +20,7 @@ async function addStory(req){
     let uid = jwt.decode(req.get('Authorization')).uid;
     let post = req.body;
     post.userid = uid;
-    return await db.addStory(post)
+    return await db.addStory(post, req.files)
 }
 
 async function updateStory(req){

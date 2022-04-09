@@ -1,4 +1,5 @@
 let mysql = require('mysql');
+let fs = require('fs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 let crypto = require("crypto");
@@ -72,19 +73,30 @@ async function executeQuery(statement,parameters=undefined){
 }
 
 async function getStories(){
-    return await executeQuery("select * from stories");
+    return await executeQuery("select s.*, i.image1, i.image2, i.image3 from stories s left join storyimages i on s.storyid = i.storyid");
 }
 
-async function addStory(story){
+async function addStory(story,images){
     //filter out emoji' people might put in their post
     let title = story.title.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
     let content = story.content.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
     let result = await executeQuery("insert into stories(title, content, score, country, userid, raceid) values(?,?,0,?,?,?)",[title, content, story.country, story.userid, story.raceid]);
-    if(result.affectedRows != 1){
-        return {success:false};
+    console.log(result);
+    if(result.affectedRows == 1){
+        const storyid = result.insertId;
+        await executeQuery("insert into storyimages(storyid)values(?)",storyid);
+        let path = `./public/images/${storyid}`;
+        if(!fs.existsSync(path)){
+            fs.mkdirSync(path);
+        }
+        for(let i = 0; i<images['files[]'].length; i++){
+            images['files[]'][i].mv(path + '/' + images['files[]'][i].name);
+            let res = await executeQuery(`update storyimages set image${i+1} = ? where storyid = ?`,[`/images/${storyid}/${images['files[]'][i].name}`,storyid]);
+        }
+        let finalpost = await executeQuery("select s.*, i.image1, i.image2, i.image3 from stories s left join storyimages i on s.storyid = i.storyid where s.storyid = ?", storyid); 
+        return {success:true, story:finalpost[0]};
     }
-    let createdStory = await executeQuery("select * from stories where storyid = ?",result.insertId);
-    return {success:true,story:createdStory[0]};
+    return {success:false};
 }
 
 async function updateStory(postid, title, content){
@@ -95,8 +107,12 @@ async function updateStory(postid, title, content){
 }
 
 async function deleteStory(storyid){
-    let result = await executeQuery("delete from stories where storyid = ?",storyid);
+    let result = await executeQuery("delete from storyimages where storyid = ?", storyid);
     if(result.affectedRows == 1){
+        await executeQuery("delete from stories where storyid = ?",storyid);
+        fs.rm(`./public/images/${storyid}`, { recursive: true, force: true }, (err)=>{
+            return false;
+        })
         return true;
     }
     return false;
@@ -187,7 +203,7 @@ async function getUser(uid){
     let user = await executeQuery("select id, username, userscore from user where id = ?", uid);
     let score = await executeQuery("select sum(score) as score from stories where userid = ?", uid);
     let racesvisited = await executeQuery("select count(*) as count from userraces where userid = ?",uid);
-    let stories = await executeQuery("select * from stories where userid = ?", uid);
+    let stories = await executeQuery("select s.*, i.image1, i.image2, i.image3 from stories s left join storyimages i on s.storyid = i.storyid where userid = ?", uid);
     let res = user[0];
     res.userscore = score[0].score;
     res.stories = stories;
