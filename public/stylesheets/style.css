@@ -6,3 +6,18 @@ body {
 a {
   color: #00B7FF;
 }
+
+h1{
+  padding-left: 1rem;
+}
+
+body>div{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+body>div>div{
+  height: 20vh;
+  width: 10vw;
+  margin: 1rem;
+}
