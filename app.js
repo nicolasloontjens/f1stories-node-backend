@@ -26,11 +26,11 @@ app.use(fileUpload());
 
 app.use(cors({"origin":true}));
 
-//app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/stories',storiesRouter);
-app.use('/comments',commentsRouter);
-app.use('/races', racesRouter);
+app.use('/', indexRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/stories',storiesRouter);
+app.use('/api/comments',commentsRouter);
+app.use('/api/races', racesRouter);
 
 app.use(express.static('public'));
 

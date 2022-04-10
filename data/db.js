@@ -93,13 +93,15 @@ async function addStory(story,images){
     if(result.affectedRows == 1){
         const storyid = result.insertId;
         await executeQuery("insert into storyimages(storyid)values(?)",storyid);
-        let path = `./public/images/${storyid}`;
-        if(!fs.existsSync(path)){
-            fs.mkdirSync(path);
-        }
-        for(let i = 0; i<images['files[]'].length; i++){
-            images['files[]'][i].mv(path + '/' + images['files[]'][i].name);
-            await executeQuery(`update storyimages set image${i+1} = ? where storyid = ?`,[`/images/${storyid}/${images['files[]'][i].name}`,storyid]);
+        if(images !== undefined){
+            let path = `./public/images/${storyid}`;
+            if(!fs.existsSync(path)){
+                fs.mkdirSync(path);
+            }
+            for(let i = 0; i<images['files[]'].length; i++){
+                images['files[]'][i].mv(path + '/' + images['files[]'][i].name);
+                await executeQuery(`update storyimages set image${i+1} = ? where storyid = ?`,[`/images/${storyid}/${images['files[]'][i].name}`,storyid]);
+            }
         }
         let finalpost = await executeQuery("select s.*, i.image1, i.image2, i.image3 from stories s left join storyimages i on s.storyid = i.storyid where s.storyid = ?", storyid); 
         return {success:true, story:finalpost[0]};
@@ -117,15 +119,19 @@ async function updateStory(postid, title, content){
 
 //delete story from table + the images
 async function deleteStory(storyid){
-    let result = await executeQuery("delete from storyimages where storyid = ?", storyid);
-    if(result.affectedRows == 1){
+    try{
+        await executeQuery("delete from storyimages where storyid = ?", storyid);
+        await executeQuery("delete from comments where storyid = ?", storyid);
+        await executeQuery("delete from userinteracts where storyid = ?", storyid);
+        
         await executeQuery("delete from stories where storyid = ?",storyid);
         fs.rm(`./public/images/${storyid}`, { recursive: true, force: true }, (err)=>{
             return false;
         })
         return true;
+    }catch(error){
+        return false;
     }
-    return false;
 }
 
 async function checkIfPostBelongsToUser(postid, uid){
