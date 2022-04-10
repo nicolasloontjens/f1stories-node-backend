@@ -80,4 +80,11 @@ create table userinteracts(
     interaction int,
     foreign key (userid) references user(id),
     foreign key (storyid) references stories(storyid)
-)
+);
+
+insert into user(username, password, token, userscore) values("test","atestuser","test",0);
+insert into stories(title, content, score, country, userid, raceid) values("a test post","test", 1, "Belgium",1,2);
+insert into storyimages(storyid) values(1);
+insert into comments(userid, storyid, content) values(1,1,"a test comment");
+insert into userraces(userid, raceid) values(1,1);
+insert into userinteracts(userid, storyid, interaction) values(1,1,1);

@@ -1,5 +1,4 @@
 let express = require('express');
-const res = require('express/lib/response');
 let router = express.Router();
 let storyController = require("../controllers/StoryController");
 let commentController = require("../controllers/CommentController");

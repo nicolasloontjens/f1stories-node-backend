@@ -17,6 +17,7 @@ async function registerUser(username, password,token){
     if(res.affectedRows != 1){
         return {success:false};
     }
+    // eslint-disable-next-line no-undef
     const tokenwithid = jwt.sign({uid:res.insertId,username:username,password:password},process.env.SECRET);
     await updateToken(res.insertId,tokenwithid);
     return {success:true,token:tokenwithid};
@@ -40,10 +41,16 @@ async function updateToken(id, token){
 //promise version to execute query's
 async function executeQuery(statement,parameters=undefined){
     let connection = mysql.createConnection({
+        //eslint reporting that process is undefined, that's why its disabled here
+        // eslint-disable-next-line no-undef
         host: process.env.DB_HOST,
+        // eslint-disable-next-line no-undef
         port: process.env.DB_PORT,
+        // eslint-disable-next-line no-undef
         user: process.env.DB_USERNAME,
+        // eslint-disable-next-line no-undef
         password: process.env.DB_PASSWORD,
+        // eslint-disable-next-line no-undef
         database: process.env.DB_DATABASE
     });
     return new Promise((success, fail)=>{
@@ -72,16 +79,17 @@ async function executeQuery(statement,parameters=undefined){
     })
 }
 
+//get all stories + images
 async function getStories(){
     return await executeQuery("select s.*, i.image1, i.image2, i.image3 from stories s left join storyimages i on s.storyid = i.storyid");
 }
 
+//add a story to stories table + add images to public folder and add the to the storyimages table
 async function addStory(story,images){
     //filter out emoji' people might put in their post
     let title = story.title.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
     let content = story.content.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
     let result = await executeQuery("insert into stories(title, content, score, country, userid, raceid) values(?,?,0,?,?,?)",[title, content, story.country, story.userid, story.raceid]);
-    console.log(result);
     if(result.affectedRows == 1){
         const storyid = result.insertId;
         await executeQuery("insert into storyimages(storyid)values(?)",storyid);
@@ -91,7 +99,7 @@ async function addStory(story,images){
         }
         for(let i = 0; i<images['files[]'].length; i++){
             images['files[]'][i].mv(path + '/' + images['files[]'][i].name);
-            let res = await executeQuery(`update storyimages set image${i+1} = ? where storyid = ?`,[`/images/${storyid}/${images['files[]'][i].name}`,storyid]);
+            await executeQuery(`update storyimages set image${i+1} = ? where storyid = ?`,[`/images/${storyid}/${images['files[]'][i].name}`,storyid]);
         }
         let finalpost = await executeQuery("select s.*, i.image1, i.image2, i.image3 from stories s left join storyimages i on s.storyid = i.storyid where s.storyid = ?", storyid); 
         return {success:true, story:finalpost[0]};
@@ -99,6 +107,7 @@ async function addStory(story,images){
     return {success:false};
 }
 
+//update the story of a user
 async function updateStory(postid, title, content){
     let newtitle = title.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
     let newcontent = content.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
@@ -106,6 +115,7 @@ async function updateStory(postid, title, content){
     return result.affectedRows == 1;
 }
 
+//delete story from table + the images
 async function deleteStory(storyid){
     let result = await executeQuery("delete from storyimages where storyid = ?", storyid);
     if(result.affectedRows == 1){
@@ -125,10 +135,12 @@ async function checkIfPostBelongsToUser(postid, uid){
     }
 }
 
+//get comments of a story
 async function getComments(storyid){
     return await executeQuery("select c.*, u.username from comments c join user u on c.userid = u.id where storyid = ?", storyid);
 }
 
+//add a comment to a story
 async function addComment(storyid, uid, content){
     try{
         let result = await executeQuery("insert into comments(userid, storyid, content)values(?,?,?)",[uid,parseInt(storyid),content]);
@@ -140,6 +152,7 @@ async function addComment(storyid, uid, content){
         return {success:false};
     }
 }
+
 
 async function checkIfCommentBelongsToUser(commentid, uid){
     let result = await executeQuery("select * from comments where commentid = ? and userid = ?",[commentid, uid]);
@@ -161,11 +174,11 @@ async function deleteComment(commentid){
     return result.affectedRows == 1;
 }
 
+//allow the user to like / dislike a story
 async function interactWithPost(storyid, uid, value){
     let getinteract = await executeQuery("select * from userinteracts where userid = ? and storyid = ?",[uid, storyid])
     if(getinteract.length == 1){
         let previousinteract = await executeQuery("select interaction from userinteracts where userid = ? and storyid = ?",[uid, storyid]);
-        console.log(previousinteract[0].interaction);
         if(previousinteract[0].interaction == value){
             return {success:false,message:"Can't like / dislike, you already liked / disliked."};
         }
@@ -190,6 +203,7 @@ async function interactWithPost(storyid, uid, value){
     }
 }
 
+//helper function for interactWithPost
 async function setStoryScore(storyid, query, query1){
     let res = await executeQuery(query,storyid);
     if(query1.affectedRows == 1 && res.affectedRows == 1){
@@ -199,6 +213,7 @@ async function setStoryScore(storyid, query, query1){
     }
 }
 
+//get user info + stories + score
 async function getUser(uid){
     let user = await executeQuery("select id, username, userscore from user where id = ?", uid);
     let score = await executeQuery("select sum(score) as score from stories where userid = ?", uid);
@@ -211,6 +226,7 @@ async function getUser(uid){
     return res;
 }
 
+//user can add a race that they have visisted, increasing their count
 async function addUserRace(uid, race){
     let data = await executeQuery("select raceid from races where title = ?", race);
     if(data.length > 0){
