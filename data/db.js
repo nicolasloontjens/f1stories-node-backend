@@ -81,7 +81,7 @@ async function executeQuery(statement,parameters=undefined){
 
 //get all stories + images
 async function getStories(){
-    return await executeQuery("select s.*, i.image1, i.image2, i.image3 from stories s left join storyimages i on s.storyid = i.storyid");
+    return await executeQuery("select s.*, i.image1, i.image2, i.image3, u.username from stories s left join storyimages i on s.storyid = i.storyid left join user u on s.userid = u.id");
 }
 
 //add a story to stories table + add images to public folder and add the to the storyimages table
@@ -125,7 +125,7 @@ async function deleteStory(storyid){
         await executeQuery("delete from userinteracts where storyid = ?", storyid);
         
         await executeQuery("delete from stories where storyid = ?",storyid);
-        fs.rm(`./public/images/${storyid}`, { recursive: true, force: true }, (err)=>{
+        fs.rm(`./public/images/${storyid}`, { recursive: true, force: true }, (_err)=>{
             return false;
         })
         return true;
