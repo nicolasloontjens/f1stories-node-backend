@@ -52,4 +52,9 @@ router.post("/:id/race",async function(req,res){
   }
 })
 
+router.get("/:id/likes", async function(req,res){
+  let data = await userController.getUserLikes(req);
+  res.status(200).send(data);
+})
+
 module.exports = router;

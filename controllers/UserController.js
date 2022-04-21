@@ -50,4 +50,8 @@ async function addRace(req){
     return false;
 }
 
-module.exports = {register, login, get, addRace}
+async function getUserLikes(req){
+    return await db.getUserLikes(req.params.id);
+}
+
+module.exports = {register, login, get, addRace, getUserLikes}

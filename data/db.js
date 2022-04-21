@@ -244,6 +244,10 @@ async function addUserRace(uid, race){
     return false;
 }
 
+async function getUserLikes(id){
+    return await executeQuery('select storyid, interaction from userinteracts where userid = ?', id);
+}
+
 async function getRaces(){
     return await executeQuery("select * from races");
 }
@@ -252,5 +256,5 @@ module.exports = { isUsernameFree,
     registerUser, loginUser, updateToken, getStories, 
     addStory, updateStory, deleteStory, checkIfPostBelongsToUser,
     getComments, addComment, checkIfCommentBelongsToUser, updateComment,
-    deleteComment, interactWithPost, getUser, addUserRace, getRaces
+    deleteComment, interactWithPost, getUser, addUserRace, getRaces, getUserLikes
 }

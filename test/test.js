@@ -176,5 +176,12 @@ describe('API TASKS',()=>{
             assert.equal(res.body.length,1);
         })
     })
+    describe('GET /users/:id/likes',()=>{
+        it('It should get the likes of a user', async function(){
+            const res = await chai.request(url).get('/users/1/likes').send();
+            assert.equal(res.status, 200);
+            assert.equal(res.body.length, 1)
+        })
+    })
 });
 
