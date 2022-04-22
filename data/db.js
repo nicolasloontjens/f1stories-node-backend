@@ -98,7 +98,6 @@ async function addStory(story,images){
             if(!fs.existsSync(path)){
                 fs.mkdirSync(path);
             }
-            console.log(images['files[]'])
             if(Array.isArray(images['files[]'])){
                 for(let i = 0; i<images['files[]'].length; i++){
                     images['files[]'][i].mv(path + '/' + images['files[]'][i].name);
