@@ -93,7 +93,7 @@ async function addStory(story,images){
     if(result.affectedRows == 1){
         const storyid = result.insertId;
         await executeQuery("insert into storyimages(storyid)values(?)",storyid);
-        if(images !== undefined){
+        if(images !== undefined && images !== null){
             let path = `./public/images/${storyid}`;
             if(!fs.existsSync(path)){
                 fs.mkdirSync(path);

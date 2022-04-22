@@ -43,7 +43,7 @@ async function interactWithPost(req){
     let uid = jwt.decode(req.get('Authorization')).uid;
     let value = req.body.interact;
     let storyid = req.params.id;
-    return await db.interactWithPost(storyid, uid, value);
+    return await db.interactWithPost(parseInt(storyid), uid, value);
 }
 
 function noToken(req){
