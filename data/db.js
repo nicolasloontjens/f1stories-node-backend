@@ -98,10 +98,17 @@ async function addStory(story,images){
             if(!fs.existsSync(path)){
                 fs.mkdirSync(path);
             }
-            for(let i = 0; i<images['files[]'].length; i++){
-                images['files[]'][i].mv(path + '/' + images['files[]'][i].name);
-                await executeQuery(`update storyimages set image${i+1} = ? where storyid = ?`,[`/images/${storyid}/${images['files[]'][i].name}`,storyid]);
+            console.log(images['files[]'])
+            if(Array.isArray(images['files[]'])){
+                for(let i = 0; i<images['files[]'].length; i++){
+                    images['files[]'][i].mv(path + '/' + images['files[]'][i].name);
+                    await executeQuery(`update storyimages set image${i+1} = ? where storyid = ?`,[`/images/${storyid}/${images['files[]'][i].name}`,storyid]);
+                }
+            }else{
+                images['files[]'].mv(path + '/' + images['files[]'].name);
+                await executeQuery(`update storyimages set image1 = ? where storyid = ?`,[`/images/${storyid}/${images['files[]'].name}`,storyid]);
             }
+            
         }
         let finalpost = await executeQuery("select s.*, i.image1, i.image2, i.image3 from stories s left join storyimages i on s.storyid = i.storyid where s.storyid = ?", storyid); 
         return {success:true, story:finalpost[0]};
