@@ -22,7 +22,6 @@ describe('API TASKS',()=>{
             assert.equal(res.status,200);
             assert.isArray(res.body);
             const firstStory = res.body[0];
-            assert.equal(firstStory.title,"a test post");
             assert.equal(firstStory.content,"test");
             assert.equal(firstStory.score,1);
             assert.equal(firstStory.userid,1);
@@ -80,7 +79,6 @@ describe('API TASKS',()=>{
     describe('POST /stories',()=>{
         it("It should CREATE a story", async function(){
             const res = await chai.request(url).post('/stories').set('Authorization',usertoken).send({
-                title:"test",
                 content:"testing",
                 country:'Belgium',
                 raceid:2,
@@ -127,7 +125,6 @@ describe('API TASKS',()=>{
     describe('PUT /stories/:id',()=>{
         it('It should UPDATE the post',async function(){
             const res = await chai.request(url).put(`/stories/${storyid}`).set('Authorization', usertoken).send({
-                "title":"test2",
                 "content":"test2"
             })
             assert.equal(res.status, 202);
@@ -136,7 +133,6 @@ describe('API TASKS',()=>{
             const res = await chai.request(url).get('/stories').send();
             assert.equal(res.status,200);
             assert.equal(res.body[1].storyid, storyid);
-            assert.equal(res.body[1].title, "test2");
             assert.equal(res.body[1].content, "test2");            
         })
     })

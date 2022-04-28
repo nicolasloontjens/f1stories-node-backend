@@ -87,9 +87,8 @@ async function getStories(){
 //add a story to stories table + add images to public folder and add the to the storyimages table
 async function addStory(story,images){
     //filter out emoji' people might put in their post
-    let title = story.title.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
     let content = story.content.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
-    let result = await executeQuery("insert into stories(title, content, score, country, userid, raceid) values(?,?,0,?,?,?)",[title, content, story.country, story.userid, story.raceid]);
+    let result = await executeQuery("insert into stories(content, score, country, userid, raceid) values(?,0,?,?,?)",[content, story.country, story.userid, story.raceid]);
     if(result.affectedRows == 1){
         const storyid = result.insertId;
         await executeQuery("insert into storyimages(storyid)values(?)",storyid);
@@ -116,10 +115,9 @@ async function addStory(story,images){
 }
 
 //update the story of a user
-async function updateStory(postid, title, content){
-    let newtitle = title.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
+async function updateStory(postid, content){
     let newcontent = content.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'');
-    let result = await executeQuery("update stories set title = ?, content = ? where storyid = ?",[newtitle, newcontent, postid]);
+    let result = await executeQuery("update stories set content = ? where storyid = ?",[newcontent, postid]);
     return result.affectedRows == 1;
 }
 

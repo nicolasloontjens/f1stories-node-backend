@@ -11,7 +11,6 @@ create table user(
 
 create table stories(
     storyid int primary key auto_increment,
-    title nvarchar(250),
     content nvarchar(5000),
     score int,
     country nvarchar(300),
@@ -83,7 +82,7 @@ create table userinteracts(
 );
 
 insert into user(username, password, token, userscore) values("test","atestuser","test",0);
-insert into stories(title, content, score, country, userid, raceid) values("a test post","test", 1, "Belgium",1,2);
+insert into stories(content, score, country, userid, raceid) values("test", 1, "Belgium",1,2);
 insert into storyimages(storyid) values(1);
 insert into comments(userid, storyid, content) values(1,1,"a test comment");
 insert into userraces(userid, raceid) values(1,1);

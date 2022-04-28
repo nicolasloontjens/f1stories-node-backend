@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
 
-app.use(cors({"origin":true}));
+app.use(cors({"origin":'*',optionsSuccessStatus:200}));
 
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);

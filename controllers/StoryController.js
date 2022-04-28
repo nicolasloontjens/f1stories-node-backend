@@ -26,7 +26,7 @@ async function addStory(req){
 async function updateStory(req){
     let data = req.body;
     if(await db.checkIfPostBelongsToUser(req.params.id, jwt.decode(req.get('Authorization')).uid)){
-        return await db.updateStory(req.params.id, data.title, data.content);
+        return await db.updateStory(req.params.id, data.content);
     }
     return false;
 }
