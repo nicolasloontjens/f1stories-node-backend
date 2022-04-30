@@ -97,16 +97,18 @@ async function addStory(story,images){
             if(!fs.existsSync(path)){
                 fs.mkdirSync(path);
             }
-            if(Array.isArray(images['files[]'])){
-                for(let i = 0; i<images['files[]'].length; i++){
-                    images['files[]'][i].mv(path + '/' + images['files[]'][i].name);
-                    await executeQuery(`update storyimages set image${i+1} = ? where storyid = ?`,[`/images/${storyid}/${images['files[]'][i].name}`,storyid]);
-                }
-            }else{
-                images['files[]'].mv(path + '/' + images['files[]'].name);
-                await executeQuery(`update storyimages set image1 = ? where storyid = ?`,[`/images/${storyid}/${images['files[]'].name}`,storyid]);
+            if(images['file0'] != null){
+                images['file0'].mv(path + '/' + images['file0'].name);
+                await executeQuery(`update storyimages set image1 = ? where storyid = ?`,[`/images/${storyid}/${images['file0'].name}`,storyid]);
             }
-            
+            if(images['file1'] != null){
+                images['file1'].mv(path + '/' + images['file1'].name);
+                await executeQuery(`update storyimages set image2 = ? where storyid = ?`,[`/images/${storyid}/${images['file1'].name}`,storyid]);
+            }
+            if(images['file2'] != null){
+                images['file2'].mv(path + '/' + images['file2'].name);
+                await executeQuery(`update storyimages set image3 = ? where storyid = ?`,[`/images/${storyid}/${images['file2'].name}`,storyid]);
+            }
         }
         let finalpost = await executeQuery("select s.*, i.image1, i.image2, i.image3 from stories s left join storyimages i on s.storyid = i.storyid where s.storyid = ?", storyid); 
         return {success:true, story:finalpost[0]};
