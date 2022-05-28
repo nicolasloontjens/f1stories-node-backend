@@ -93,7 +93,7 @@ Body =>
 ```
 like or un-like a post
 
-- POST /users/{uid}/race
+- POST /users/{uid}/race  
 Body =>
 ```
     "race":"Bahrain GP"
