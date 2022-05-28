@@ -125,7 +125,7 @@ describe('API TASKS',()=>{
     describe('PUT /stories/:id',()=>{
         it('It should UPDATE the post',async function(){
             const res = await chai.request(url).put(`/stories/${storyid}`).set('Authorization', usertoken).send({
-                "content":"test2"
+                "input":"test2"
             })
             assert.equal(res.status, 202);
         })
