@@ -25,6 +25,9 @@ This version is not running online, but the Laravel version is.
 
 ## Endpoints:
 
+NOTE: all endpoints with POST, PUT and DELETE require a JWT token in the
+Authorization header of the request, this token is given when registering as a user, and updated when logging in as a user
+
 - POST /users/register
 - POST /users/login  
 => body required for these:
